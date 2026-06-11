@@ -1,0 +1,43 @@
+body{
+    font-family: 'Times New Roman', Times, serif;
+    background-color: white;
+}
+.logbook-container {
+      overflow-x: auto;
+      background: white;
+      padding: 10px;
+      border: 1px solid #999;
+}
+
+th, td {
+      border: 1px solid #333;
+      text-align: center;
+      vertical-align: middle;
+      padding: 2px;
+      height: 28px;
+}
+
+.checkbox{
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 1px solid black;
+    cursor: pointer;
+    text-align: center;
+    vertical-align: middle;
+}
+.checkbox:checked::after{
+    content: "X";
+    display: block;
+    font-weight: bold;
+    font-size: 14px;
+    line-height: 18px;
+}
+.input.checkbox{
+    width: 18px;
+    height: 18px;
+}
+
+#logbook-rows tr:nth-child(3n) input{
+    background-color: grey;
+}

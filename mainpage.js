@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const maxRowsPerPage = 18;
     const addRowButton = document.querySelector(".table-button");
     const newPageButton = document.querySelector(".new-page-button");
-    const currentLogbookRows = document.querySelector(".logbook-rows");
+    let currentLogbookRows = document.querySelector(".logbook-rows");
 
     function updatePageButtons() {
     const currentRows = currentLogbookRows.querySelectorAll("tr").length;
@@ -23,10 +23,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
         newRow.innerHTML = `
             <td><input type="text" placeholder="dd/mm/yy"></td>
-            <td><input type="text"></td>
-            <td><input type="text"></td>
-            <td><input type="text"></td>
-            <td><input type="text"></td>
+
+            <td><input type="text" maxlength="4"></td>
+            <td><input type="text" class="time-input" inputmode="numeric" maxlength="4"></td>
+
+            <td><input type="text" maxlength="4"></td>
+            <td><input type="text" class="time-input" inputmode="numeric" maxlength="4"></td>
+
             <td><input type="text"></td>
             <td><input type="text"></td>
             <td><input type="checkbox" class="checkbox"></td>
@@ -45,7 +48,7 @@ document.addEventListener("DOMContentLoaded", function () {
             <td><input type="text"></td>
             <td><input type="text"></td>
             <td><input type="text"></td>
-            <td><input type="text"></td>
+            <td><input type="text" placeholder="dd/mm/yy"></td>
             <td><input type="text"></td>
             <td><input type="text"></td>
             <td><input type="text"></td>
@@ -119,11 +122,14 @@ document.addEventListener("DOMContentLoaded", function () {
             const newRow = document.createElement("tr");
 
             newRow.innerHTML = `
-            <td><input type="text" placeholder="dd/mm/yy"></td>
-                <td><input type="text"></td>
-                <td><input type="text"></td>
-                <td><input type="text"></td>
-                <td><input type="text"></td>
+                <td><input type="text" placeholder="dd/mm/yy"></td>
+
+                <td><input type="text" maxlength="4"></td>
+                <td><input type="text" class="time-input" inputmode="numeric" maxlength="4"></td>
+
+                <td><input type="text" maxlength="4"></td>
+                <td><input type="text" class="time-input" inputmode="numeric" maxlength="4"></td>
+
                 <td><input type="text"></td>
                 <td><input type="text"></td>
                 <td><input type="checkbox" class="checkbox"></td>
@@ -141,7 +147,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 <td><input type="text"></td>
                 <td><input type="text"></td>
                 <td><input type="text"></td>
-                <td><input type="text"></td>
+                <td><input type="text" placeholder="dd/mm/yy"></td>
                 <td><input type="text"></td>
                 <td><input type="text"></td>
                 <td><input type="text"></td>
@@ -171,6 +177,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
     newPageButton.addEventListener("click", function () {
         createNewPage();
+});
+
+document.addEventListener("input", function (event) {
+    if (event.target.classList.contains("time-input")) {
+        event.target.value = event.target.value.replace(/\D/g, "");
+    }
 });
 
     currentLogbookRows.addEventListener("input", saveLogbook);

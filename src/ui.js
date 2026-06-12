@@ -151,8 +151,32 @@ function createControl(field, entry, rowIndex) {
 
   control.addEventListener("input", handleInput);
   control.addEventListener("blur", handleBlur);
+  control.addEventListener("keydown", handleCellKeydown);
 
   return control;
+}
+
+function handleCellKeydown(event) {
+  if (event.key !== "Enter") return;
+
+  event.preventDefault();
+
+  const rowIndex = Number(event.target.dataset.row);
+  const fieldKey = event.target.dataset.field;
+  const fieldIndex = LOGBOOK_FIELDS.findIndex((field) => field.key === fieldKey);
+  const nextField = LOGBOOK_FIELDS[fieldIndex + 1];
+
+  event.target.blur();
+
+  if (!nextField) return;
+
+  requestAnimationFrame(() => {
+    const nextCell = document.querySelector(
+      `[data-row="${rowIndex}"][data-field="${nextField.key}"]`
+    );
+
+    if (nextCell) nextCell.focus();
+  });
 }
 
 function handleInput(event) {

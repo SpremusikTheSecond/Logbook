@@ -2,8 +2,9 @@
   --ink: #161616;
   --muted: #5f625d;
   --line: #222;
-  --paper: #fffdf7;
-  --paper-soft: #f4f0e5;
+  --paper: #fff;
+  --paper-soft: #fff;
+  --row-shade: #eeeeee;
   --accent: #1f6f78;
   --accent-strong: #104f57;
   --error: #b42318;
@@ -17,7 +18,7 @@
 body {
   margin: 0;
   color: var(--ink);
-  background: #e9e5d8;
+  background: #fff;
   font-family: Georgia, "Times New Roman", serif;
 }
 
@@ -81,7 +82,7 @@ main {
   gap: 1px;
   margin-bottom: 14px;
   border: 2px solid var(--line);
-  background: var(--line);
+  background: #fff;
 }
 
 .summary-strip div {
@@ -127,7 +128,7 @@ td {
 th {
   height: 28px;
   padding: 3px 4px;
-  background: var(--paper-soft);
+  background: #fff;
   font: 700 10px/1.1 Arial, sans-serif;
   text-transform: uppercase;
 }
@@ -138,10 +139,8 @@ td {
   background: #fff;
 }
 
-tbody tr:nth-child(6n + 3) td,
-tbody tr:nth-child(6n + 4) td,
-tbody tr:nth-child(6n + 5) td {
-  background: #f7f5ee;
+tbody tr:nth-child(3n) td {
+  background: var(--row-shade);
 }
 
 input,
@@ -193,7 +192,7 @@ tfoot th {
 }
 
 tfoot td {
-  background: var(--paper-soft);
+  background: #fff;
   font: 700 12px/1 Arial, sans-serif;
 }
 

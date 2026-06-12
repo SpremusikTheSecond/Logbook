@@ -37,14 +37,21 @@ export function isValidIcao(value) {
   return value === "" || /^[A-Z]{4}$/.test(value);
 }
 
+export function isValidRegistration(value) {
+  return value === "" || /^[A-Z0-9-]{1,7}$/.test(value);
+}
+
 export function isValidInteger(value) {
   return value === "" || /^\d+$/.test(String(value).trim());
 }
 
 export function normalizeFieldValue(type, value) {
+  if (type === FIELD_TYPES.CHECKBOX) return Boolean(value);
+
   const raw = String(value || "").trim();
 
   if (type === FIELD_TYPES.ICAO) return raw.toUpperCase();
+  if (type === FIELD_TYPES.REGISTRATION) return raw.toUpperCase().slice(0, 7);
   if (type === FIELD_TYPES.CLOCK || type === FIELD_TYPES.DURATION) return normalizeTimeInput(raw);
   if (type === FIELD_TYPES.INTEGER) return raw.replace(/[^\d]/g, "");
 
@@ -57,6 +64,10 @@ export function validateField(field, value) {
 
   if (field.type === FIELD_TYPES.ICAO && !isValidIcao(normalized)) {
     return { valid: false, value: normalized, message: "ICAO aerodrome codes must be exactly four uppercase letters." };
+  }
+
+  if (field.type === FIELD_TYPES.REGISTRATION && !isValidRegistration(normalized)) {
+    return { valid: false, value: normalized, message: "Registration must be 7 characters or fewer, using uppercase letters, numbers, or hyphens." };
   }
 
   if (field.type === FIELD_TYPES.CLOCK && !isValidTime(normalized)) {

@@ -1,4 +1,4 @@
-import { buildFooterCells, calculateTotals, enrichEntry, minutesToDuration } from "./calculations.js";
+import { buildFooterCells, enrichEntry } from "./calculations.js";
 import { FIELD_TYPES, LOGBOOK_FIELDS, createEmptyEntry, createEmptyLogbook } from "./schema.js";
 import { downloadJson, loadLocalLogbook, readJsonFile, saveLocalLogbook } from "./storage.js";
 import { exportPdf } from "./pdf.js";
@@ -66,18 +66,32 @@ function render() {
 
   renderBody();
   renderFoot();
-  renderSummary();
 }
 
 function renderHead() {
   tableCols.innerHTML = LOGBOOK_FIELDS.map((field) => `<col style="width:${field.width}px">`).join("");
   tableHead.innerHTML = `
     <tr>
+      <th>1</th>
+      <th colspan="2">2</th>
+      <th colspan="2">3</th>
+      <th colspan="2">4</th>
+      <th colspan="2">5</th>
+      <th>6</th>
+      <th>7</th>
+      <th>8</th>
+      <th colspan="4">9</th>
+      <th colspan="2">10</th>
+      <th colspan="4">11</th>
+      <th colspan="3">12</th>
+      <th>13</th>
+    </tr>
+    <tr>
       <th rowspan="3">Date<br>(dd/mm/yy)</th>
       <th colspan="2">Departure</th>
       <th colspan="2">Arrival</th>
       <th colspan="2">Aircraft</th>
-      <th colspan="2">Single-pilot time</th>
+      <th colspan="2">Single-pilot</th>
       <th rowspan="3">Multi-pilot<br>time</th>
       <th rowspan="3">Total time<br>of flight</th>
       <th rowspan="3">Name PIC</th>
@@ -136,10 +150,20 @@ function createControl(field, entry, rowIndex) {
     ? document.createElement("textarea")
     : document.createElement("input");
 
-  if (control.tagName === "INPUT") control.type = "text";
-  control.value = entry[field.key] || "";
+  if (control.tagName === "INPUT") {
+    control.type = field.type === FIELD_TYPES.CHECKBOX ? "checkbox" : "text";
+  }
+
+  if (field.type === FIELD_TYPES.CHECKBOX) {
+    control.checked = Boolean(entry[field.key]);
+    control.classList.add("tick-box");
+  } else {
+    control.value = entry[field.key] || "";
+  }
+
   control.placeholder = field.placeholder || "";
   control.readOnly = Boolean(field.readonly);
+  if (field.maxLength) control.maxLength = field.maxLength;
   control.dataset.row = rowIndex;
   control.dataset.field = field.key;
 
@@ -184,11 +208,12 @@ function handleInput(event) {
   const fieldKey = event.target.dataset.field;
   if (LOGBOOK_FIELDS.find((field) => field.key === fieldKey)?.readonly) return;
 
-  logbook.entries[rowIndex][fieldKey] = event.target.value;
+  logbook.entries[rowIndex][fieldKey] = event.target.type === "checkbox"
+    ? event.target.checked
+    : event.target.value;
   logbook.entries[rowIndex] = enrichEntry(logbook.entries[rowIndex]);
   logbook = saveLocalLogbook(logbook);
   renderFoot();
-  renderSummary();
 }
 
 function handleBlur(event) {
@@ -196,7 +221,8 @@ function handleBlur(event) {
   const field = LOGBOOK_FIELDS.find((item) => item.key === event.target.dataset.field);
   if (!field || field.readonly) return;
 
-  const validation = validateField(field, event.target.value);
+  const value = event.target.type === "checkbox" ? event.target.checked : event.target.value;
+  const validation = validateField(field, value);
   logbook.entries[rowIndex][field.key] = validation.value;
   logbook.entries[rowIndex] = enrichEntry(logbook.entries[rowIndex]);
   persistAndRender(validation.valid ? "" : validation.message);
@@ -210,16 +236,6 @@ function renderFoot() {
       ${footerCells.slice(7).map((value) => `<td>${value}</td>`).join("")}
     </tr>
   `;
-}
-
-function renderSummary() {
-  const totals = calculateTotals(logbook.entries);
-  document.getElementById("summary-total").textContent = minutesToDuration(totals.totalTime);
-  document.getElementById("summary-pic").textContent = minutesToDuration(totals.picTime);
-  document.getElementById("summary-night").textContent = minutesToDuration(totals.nightTime);
-  document.getElementById("summary-ifr").textContent = minutesToDuration(totals.ifrTime);
-  document.getElementById("summary-dual").textContent = minutesToDuration(totals.dualTime);
-  document.getElementById("summary-instructor").textContent = minutesToDuration(totals.instructorTime);
 }
 
 function validateLogbook(entries) {

@@ -1,4 +1,4 @@
-import { createEmptyLogbook, LOGBOOK_FIELDS, STORAGE_VERSION } from "./schema.js";
+import { createEmptyLogbook, FIELD_TYPES, LOGBOOK_FIELDS, STORAGE_VERSION } from "./schema.js";
 
 const STORAGE_KEY = "easa-fcl070-logbook";
 
@@ -38,7 +38,11 @@ export function normalizeLogbook(candidate) {
 
 export function normalizeEntry(entry) {
   return LOGBOOK_FIELDS.reduce((normalized, field) => {
-    normalized[field.key] = entry?.[field.key] ?? "";
+    if (field.type === FIELD_TYPES.CHECKBOX) {
+      normalized[field.key] = Boolean(entry?.[field.key]);
+    } else {
+      normalized[field.key] = entry?.[field.key] ?? "";
+    }
     return normalized;
   }, {});
 }

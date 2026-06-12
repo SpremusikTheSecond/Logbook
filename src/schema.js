@@ -3,8 +3,10 @@ export const STORAGE_VERSION = 1;
 export const FIELD_TYPES = {
   TEXT: "text",
   ICAO: "icao",
+  REGISTRATION: "registration",
   CLOCK: "clock",
   DURATION: "duration",
+  CHECKBOX: "checkbox",
   DATE: "date",
   INTEGER: "integer",
   TEXTAREA: "textarea"
@@ -17,9 +19,9 @@ export const LOGBOOK_FIELDS = [
   { key: "arrivalPlace", label: "Arrival place", type: FIELD_TYPES.ICAO, placeholder: "EDDF", width: 78 },
   { key: "arrivalTime", label: "Arrival time", type: FIELD_TYPES.CLOCK, placeholder: "1420", width: 74 },
   { key: "aircraftType", label: "Make, model, variant", type: FIELD_TYPES.TEXT, width: 150 },
-  { key: "registration", label: "Registration", type: FIELD_TYPES.TEXT, width: 96 },
-  { key: "singleEngineTime", label: "SE", type: FIELD_TYPES.DURATION, placeholder: "01:30", width: 70 },
-  { key: "multiEngineTime", label: "ME", type: FIELD_TYPES.DURATION, width: 70 },
+  { key: "registration", label: "Registration", type: FIELD_TYPES.REGISTRATION, width: 96, maxLength: 7 },
+  { key: "singleEngineTime", label: "SE", type: FIELD_TYPES.CHECKBOX, width: 48 },
+  { key: "multiEngineTime", label: "ME", type: FIELD_TYPES.CHECKBOX, width: 48 },
   { key: "multiPilotTime", label: "Multi-pilot time", type: FIELD_TYPES.DURATION, width: 86 },
   { key: "totalTime", label: "Total time of flight", type: FIELD_TYPES.DURATION, readonly: true, width: 90 },
   { key: "picName", label: "Name PIC", type: FIELD_TYPES.TEXT, width: 120 },
@@ -41,7 +43,7 @@ export const LOGBOOK_FIELDS = [
 
 export function createEmptyEntry() {
   return LOGBOOK_FIELDS.reduce((entry, field) => {
-    entry[field.key] = "";
+    entry[field.key] = field.type === FIELD_TYPES.CHECKBOX ? false : "";
     return entry;
   }, {});
 }

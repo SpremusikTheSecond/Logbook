@@ -161,6 +161,26 @@ textarea {
   text-align: left;
 }
 
+input.tick-box {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  display: block;
+  margin: auto;
+  padding: 0;
+  border: 1px solid #000;
+  background: #fff;
+  cursor: pointer;
+}
+
+input.tick-box:checked::after {
+  content: "X";
+  display: block;
+  color: #000;
+  font: 700 13px/14px Arial, sans-serif;
+  text-align: center;
+}
+
 input:focus,
 textarea:focus {
   outline: 2px solid var(--accent);

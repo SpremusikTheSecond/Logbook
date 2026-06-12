@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EASA Pilot Logbook</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <header class="app-header">
+    <div>
+      <p class="eyebrow">EASA FCL.070 Pilot Logbook</p>
+      <h1>Personal Flight Log</h1>
+    </div>
+    <div class="toolbar" aria-label="Logbook actions">
+      <button id="new-logbook" type="button">New Logbook</button>
+      <button id="load-json" type="button">Load JSON</button>
+      <button id="save-json" type="button">Save JSON</button>
+      <button id="export-pdf" type="button">Export PDF</button>
+      <input id="json-file" type="file" accept="application/json,.json" hidden>
+    </div>
+  </header>
+
+  <main>
+    <section class="summary-strip" aria-label="Logbook totals">
+      <div><span>Total</span><strong id="summary-total">00:00</strong></div>
+      <div><span>PIC</span><strong id="summary-pic">00:00</strong></div>
+      <div><span>Night</span><strong id="summary-night">00:00</strong></div>
+      <div><span>IFR</span><strong id="summary-ifr">00:00</strong></div>
+      <div><span>Dual</span><strong id="summary-dual">00:00</strong></div>
+      <div><span>Instructor</span><strong id="summary-instructor">00:00</strong></div>
+    </section>
+
+    <section class="logbook-shell" aria-label="Logbook table">
+      <table class="logbook-table">
+        <colgroup id="table-cols"></colgroup>
+        <thead id="table-head"></thead>
+        <tbody id="logbook-body"></tbody>
+        <tfoot id="table-foot"></tfoot>
+      </table>
+    </section>
+
+    <div class="row-actions">
+      <button id="add-row" type="button">Add Flight</button>
+      <p id="status-message" role="status" aria-live="polite"></p>
+    </div>
+  </main>
+
+  <script type="module" src="./src/app.js"></script>
+</body>
+</html>

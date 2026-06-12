@@ -13,7 +13,7 @@ export const FIELD_TYPES = {
 };
 
 export const LOGBOOK_FIELDS = [
-  { key: "date", label: "Date", type: FIELD_TYPES.DATE, placeholder: "dd/mm/yy", width: 88 },
+  { key: "date", label: "Date", type: FIELD_TYPES.DATE, width: 124 },
   { key: "departurePlace", label: "Departure place", type: FIELD_TYPES.ICAO, placeholder: "EPWA", width: 78 },
   { key: "departureTime", label: "Departure time", type: FIELD_TYPES.CLOCK, placeholder: "1234", width: 74 },
   { key: "arrivalPlace", label: "Arrival place", type: FIELD_TYPES.ICAO, placeholder: "EDDF", width: 78 },
@@ -35,7 +35,7 @@ export const LOGBOOK_FIELDS = [
   { key: "copilotTime", label: "Co-pilot", type: FIELD_TYPES.DURATION, width: 78 },
   { key: "dualTime", label: "Dual", type: FIELD_TYPES.DURATION, width: 70 },
   { key: "instructorTime", label: "Instructor", type: FIELD_TYPES.DURATION, width: 82 },
-  { key: "simDate", label: "STD date", type: FIELD_TYPES.DATE, placeholder: "dd/mm/yy", width: 88 },
+  { key: "simDate", label: "STD date", type: FIELD_TYPES.DATE, width: 124 },
   { key: "simType", label: "STD type", type: FIELD_TYPES.TEXT, width: 86 },
   { key: "simTime", label: "STD total time", type: FIELD_TYPES.DURATION, width: 88 },
   { key: "remarks", label: "Remarks and endorsements", type: FIELD_TYPES.TEXTAREA, width: 190 }

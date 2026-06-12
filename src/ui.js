@@ -157,6 +157,9 @@ function createControl(field, entry, rowIndex) {
   if (field.type === FIELD_TYPES.CHECKBOX) {
     control.checked = Boolean(entry[field.key]);
     control.classList.add("tick-box");
+  } else if (field.type === FIELD_TYPES.DATE) {
+    control.type = "date";
+    control.value = entry[field.key] || "";
   } else {
     control.value = entry[field.key] || "";
   }

@@ -1,6 +1,6 @@
 import { FIELD_TYPES } from "./schema.js";
 
-const DATE_PATTERN = /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{2}$/;
+const DATE_PATTERN = /^(\d{4}-\d{2}-\d{2}|(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{2})$/;
 
 export function normalizeTimeInput(value) {
   const trimmed = String(value || "").trim();
@@ -79,7 +79,7 @@ export function validateField(field, value) {
   }
 
   if (field.type === FIELD_TYPES.DATE && !DATE_PATTERN.test(normalized)) {
-    return { valid: false, value: normalized, message: "Dates must use dd/mm/yy." };
+    return { valid: false, value: normalized, message: "Dates must use the calendar picker or dd/mm/yy." };
   }
 
   if (field.type === FIELD_TYPES.INTEGER && !isValidInteger(normalized)) {

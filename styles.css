@@ -181,6 +181,13 @@ input.tick-box:checked::after {
   text-align: center;
 }
 
+input[type="date"] {
+  min-width: 118px;
+  padding: 2px 4px;
+  font-size: 11px;
+  text-align: left;
+}
+
 input:focus,
 textarea:focus {
   outline: 2px solid var(--accent);

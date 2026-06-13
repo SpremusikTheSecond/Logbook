@@ -13,9 +13,9 @@ export const FIELD_TYPES = {
 export const LOGBOOK_FIELDS = [
   { key: "date", label: "Date", type: FIELD_TYPES.DATE, placeholder: "dd/mm/yy", width: 88 },
   { key: "departurePlace", label: "Departure place", type: FIELD_TYPES.ICAO, placeholder: "EPWA", width: 78 },
-  { key: "departureTime", label: "Departure time", type: FIELD_TYPES.CLOCK, placeholder: "1234", width: 74 },
+  { key: "departureTime", label: "Departure time", type: FIELD_TYPES.CLOCK, placeholder: "12:34", width: 74 },
   { key: "arrivalPlace", label: "Arrival place", type: FIELD_TYPES.ICAO, placeholder: "EDDF", width: 78 },
-  { key: "arrivalTime", label: "Arrival time", type: FIELD_TYPES.CLOCK, placeholder: "1420", width: 74 },
+  { key: "arrivalTime", label: "Arrival time", type: FIELD_TYPES.CLOCK, placeholder: "14:20", width: 74 },
   { key: "aircraftType", label: "Make, model, variant", type: FIELD_TYPES.TEXT, width: 150 },
   { key: "registration", label: "Registration", type: FIELD_TYPES.TEXT, width: 96 },
   { key: "singleEngineTime", label: "SE", type: FIELD_TYPES.DURATION, placeholder: "01:30", width: 70 },

@@ -73,20 +73,20 @@ function renderHead() {
   tableCols.innerHTML = LOGBOOK_FIELDS.map((field) => `<col style="width:${field.width}px">`).join("");
   tableHead.innerHTML = `
     <tr>
-      <th rowspan="3">Date<br>(dd/mm/yy)</th>
+      <th rowspan="2">Date<br>(dd/mm/yy)</th>
       <th colspan="2">Departure</th>
       <th colspan="2">Arrival</th>
       <th colspan="2">Aircraft</th>
       <th colspan="2">Single-pilot time</th>
-      <th rowspan="3">Multi-pilot<br>time</th>
-      <th rowspan="3">Total time<br>of flight</th>
-      <th rowspan="3">Name PIC</th>
+      <th rowspan="2">Multi-pilot<br>time</th>
+      <th rowspan="2">Total time<br>of flight</th>
+      <th rowspan="2">Name PIC</th>
       <th colspan="2">Takeoffs</th>
       <th colspan="2">Landings</th>
       <th colspan="2">Operational<br>condition time</th>
       <th colspan="4">Pilot function time</th>
       <th colspan="3">Synthetic training device session</th>
-      <th rowspan="3">Remarks<br>and endorsements</th>
+      <th rowspan="2">Remarks<br>and endorsements</th>
     </tr>
     <tr>
       <th>Place</th>
@@ -155,11 +155,35 @@ function createControl(field, entry, rowIndex) {
   return control;
 }
 
+function formatTimeWhileTyping(value) {
+  const digits = String(value || "").replace(/\D/g, "").slice(0, 4);
+
+  if (digits.lenght <= 2) {
+    return digits;
+  }
+  return `${digits.slice(0, 2)}:${digits.slice(2)}`;
+}
+
 function handleInput(event) {
   const rowIndex = Number(event.target.dataset.row);
   const fieldKey = event.target.dataset.field;
-  if (LOGBOOK_FIELDS.find((field) => field.key === fieldKey)?.readonly) return;
+  const field = LOGBOOK_FIELDS.find((field) => field.key === fieldKey);
 
+  if (field?.readonly) return;
+
+  let value = event.target.value;
+
+  const isDeleting = 
+    event.inputType === "deleteContentBackward" ||
+    event.inputType === "deleteContentForward" ;
+
+    if (
+      !isDeleting &&
+      (field?.type === FIELD_TYPES.CLOCK || field?.type === FIELD_TYPES.DURATION)
+    ){
+      value = formatTimeWhileTyping(value);
+      event.target.value = value;
+    }
   logbook.entries[rowIndex][fieldKey] = event.target.value;
   logbook.entries[rowIndex] = enrichEntry(logbook.entries[rowIndex]);
   logbook = saveLocalLogbook(logbook);

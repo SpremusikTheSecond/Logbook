@@ -2,8 +2,6 @@ import { LOGBOOK_FIELDS, FIELD_TYPES } from "./schema.js";
 import { isValidDuration, isValidTime, normalizeTimeInput } from "./validation.js";
 
 export const TOTAL_FIELDS = [
-  "singleEngineTime",
-  "multiEngineTime",
   "multiPilotTime",
   "totalTime",
   "nightTime",

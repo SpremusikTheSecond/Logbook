@@ -1,6 +1,6 @@
 import { FIELD_TYPES } from "./schema.js";
 
-const DATE_PATTERN = /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{2}$/;
+const DATE_PATTERN = /^(\d{4}-\d{2}-\d{2}|(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{2})$/;
 
 export function normalizeTimeInput(value) {
   const trimmed = String(value || "").trim();
@@ -37,14 +37,21 @@ export function isValidIcao(value) {
   return value === "" || /^[A-Z]{4}$/.test(value);
 }
 
+export function isValidRegistration(value) {
+  return value === "" || /^[A-Z0-9-]{1,7}$/.test(value);
+}
+
 export function isValidInteger(value) {
   return value === "" || /^\d+$/.test(String(value).trim());
 }
 
 export function normalizeFieldValue(type, value) {
+  if (type === FIELD_TYPES.CHECKBOX) return Boolean(value);
+
   const raw = String(value || "").trim();
 
   if (type === FIELD_TYPES.ICAO) return raw.toUpperCase();
+  if (type === FIELD_TYPES.REGISTRATION) return raw.toUpperCase().slice(0, 7);
   if (type === FIELD_TYPES.CLOCK || type === FIELD_TYPES.DURATION) return normalizeTimeInput(raw);
   if (type === FIELD_TYPES.INTEGER) return raw.replace(/[^\d]/g, "");
 
@@ -59,6 +66,10 @@ export function validateField(field, value) {
     return { valid: false, value: normalized, message: "ICAO aerodrome codes must be exactly four uppercase letters." };
   }
 
+  if (field.type === FIELD_TYPES.REGISTRATION && !isValidRegistration(normalized)) {
+    return { valid: false, value: normalized, message: "Registration must be 7 characters or fewer, using uppercase letters, numbers, or hyphens." };
+  }
+
   if (field.type === FIELD_TYPES.CLOCK && !isValidTime(normalized)) {
     return { valid: false, value: normalized, message: "Times must be valid HH:MM values." };
   }
@@ -68,7 +79,7 @@ export function validateField(field, value) {
   }
 
   if (field.type === FIELD_TYPES.DATE && !DATE_PATTERN.test(normalized)) {
-    return { valid: false, value: normalized, message: "Dates must use dd/mm/yy." };
+    return { valid: false, value: normalized, message: "Dates must use the calendar picker or dd/mm/yy." };
   }
 
   if (field.type === FIELD_TYPES.INTEGER && !isValidInteger(normalized)) {

@@ -1,4 +1,4 @@
-import { buildFooterCells, enrichEntry } from "./calculations.js";
+import { buildFooterCells, calculateTotals, enrichEntry, minutesToDuration } from "./calculations.js";
 import { FIELD_TYPES, LOGBOOK_FIELDS, createEmptyEntry, createEmptyLogbook } from "./schema.js";
 import { downloadJson, loadLocalLogbook, readJsonFile, saveLocalLogbook } from "./storage.js";
 import { exportPdf } from "./pdf.js";
@@ -66,41 +66,27 @@ function render() {
 
   renderBody();
   renderFoot();
+  renderSummary();
 }
 
 function renderHead() {
   tableCols.innerHTML = LOGBOOK_FIELDS.map((field) => `<col style="width:${field.width}px">`).join("");
   tableHead.innerHTML = `
     <tr>
-      <th>1</th>
-      <th colspan="2">2</th>
-      <th colspan="2">3</th>
-      <th colspan="2">4</th>
-      <th colspan="2">5</th>
-      <th>6</th>
-      <th>7</th>
-      <th>8</th>
-      <th colspan="4">9</th>
-      <th colspan="2">10</th>
-      <th colspan="4">11</th>
-      <th colspan="3">12</th>
-      <th>13</th>
-    </tr>
-    <tr>
-      <th rowspan="3">Date<br>(dd/mm/yy)</th>
+      <th rowspan="2">Date<br>(dd/mm/yy)</th>
       <th colspan="2">Departure</th>
       <th colspan="2">Arrival</th>
       <th colspan="2">Aircraft</th>
-      <th colspan="2">Single-pilot</th>
-      <th rowspan="3">Multi-pilot<br>time</th>
-      <th rowspan="3">Total time<br>of flight</th>
-      <th rowspan="3">Name PIC</th>
+      <th colspan="2">Single-pilot time</th>
+      <th rowspan="2">Multi-pilot<br>time</th>
+      <th rowspan="2">Total time<br>of flight</th>
+      <th rowspan="2">Name PIC</th>
       <th colspan="2">Takeoffs</th>
       <th colspan="2">Landings</th>
       <th colspan="2">Operational<br>condition time</th>
       <th colspan="4">Pilot function time</th>
       <th colspan="3">Synthetic training device session</th>
-      <th rowspan="3">Remarks<br>and endorsements</th>
+      <th rowspan="2">Remarks<br>and endorsements</th>
     </tr>
     <tr>
       <th>Place</th>
@@ -150,23 +136,10 @@ function createControl(field, entry, rowIndex) {
     ? document.createElement("textarea")
     : document.createElement("input");
 
-  if (control.tagName === "INPUT") {
-    control.type = field.type === FIELD_TYPES.CHECKBOX ? "checkbox" : "text";
-  }
-
-  if (field.type === FIELD_TYPES.CHECKBOX) {
-    control.checked = Boolean(entry[field.key]);
-    control.classList.add("tick-box");
-  } else if (field.type === FIELD_TYPES.DATE) {
-    control.type = "date";
-    control.value = entry[field.key] || "";
-  } else {
-    control.value = entry[field.key] || "";
-  }
-
+  if (control.tagName === "INPUT") control.type = "text";
+  control.value = entry[field.key] || "";
   control.placeholder = field.placeholder || "";
   control.readOnly = Boolean(field.readonly);
-  if (field.maxLength) control.maxLength = field.maxLength;
   control.dataset.row = rowIndex;
   control.dataset.field = field.key;
 
@@ -178,45 +151,44 @@ function createControl(field, entry, rowIndex) {
 
   control.addEventListener("input", handleInput);
   control.addEventListener("blur", handleBlur);
-  control.addEventListener("keydown", handleCellKeydown);
 
   return control;
 }
 
-function handleCellKeydown(event) {
-  if (event.key !== "Enter") return;
+function formatTimeWhileTyping(value) {
+  const digits = String(value || "").replace(/\D/g, "").slice(0, 4);
 
-  event.preventDefault();
-
-  const rowIndex = Number(event.target.dataset.row);
-  const fieldKey = event.target.dataset.field;
-  const fieldIndex = LOGBOOK_FIELDS.findIndex((field) => field.key === fieldKey);
-  const nextField = LOGBOOK_FIELDS[fieldIndex + 1];
-
-  event.target.blur();
-
-  if (!nextField) return;
-
-  requestAnimationFrame(() => {
-    const nextCell = document.querySelector(
-      `[data-row="${rowIndex}"][data-field="${nextField.key}"]`
-    );
-
-    if (nextCell) nextCell.focus();
-  });
+  if (digits.lenght <= 2) {
+    return digits;
+  }
+  return `${digits.slice(0, 2)}:${digits.slice(2)}`;
 }
 
 function handleInput(event) {
   const rowIndex = Number(event.target.dataset.row);
   const fieldKey = event.target.dataset.field;
-  if (LOGBOOK_FIELDS.find((field) => field.key === fieldKey)?.readonly) return;
+  const field = LOGBOOK_FIELDS.find((field) => field.key === fieldKey);
 
-  logbook.entries[rowIndex][fieldKey] = event.target.type === "checkbox"
-    ? event.target.checked
-    : event.target.value;
+  if (field?.readonly) return;
+
+  let value = event.target.value;
+
+  const isDeleting = 
+    event.inputType === "deleteContentBackward" ||
+    event.inputType === "deleteContentForward" ;
+
+    if (
+      !isDeleting &&
+      (field?.type === FIELD_TYPES.CLOCK || field?.type === FIELD_TYPES.DURATION)
+    ){
+      value = formatTimeWhileTyping(value);
+      event.target.value = value;
+    }
+  logbook.entries[rowIndex][fieldKey] = event.target.value;
   logbook.entries[rowIndex] = enrichEntry(logbook.entries[rowIndex]);
   logbook = saveLocalLogbook(logbook);
   renderFoot();
+  renderSummary();
 }
 
 function handleBlur(event) {
@@ -224,8 +196,7 @@ function handleBlur(event) {
   const field = LOGBOOK_FIELDS.find((item) => item.key === event.target.dataset.field);
   if (!field || field.readonly) return;
 
-  const value = event.target.type === "checkbox" ? event.target.checked : event.target.value;
-  const validation = validateField(field, value);
+  const validation = validateField(field, event.target.value);
   logbook.entries[rowIndex][field.key] = validation.value;
   logbook.entries[rowIndex] = enrichEntry(logbook.entries[rowIndex]);
   persistAndRender(validation.valid ? "" : validation.message);
@@ -239,6 +210,16 @@ function renderFoot() {
       ${footerCells.slice(7).map((value) => `<td>${value}</td>`).join("")}
     </tr>
   `;
+}
+
+function renderSummary() {
+  const totals = calculateTotals(logbook.entries);
+  document.getElementById("summary-total").textContent = minutesToDuration(totals.totalTime);
+  document.getElementById("summary-pic").textContent = minutesToDuration(totals.picTime);
+  document.getElementById("summary-night").textContent = minutesToDuration(totals.nightTime);
+  document.getElementById("summary-ifr").textContent = minutesToDuration(totals.ifrTime);
+  document.getElementById("summary-dual").textContent = minutesToDuration(totals.dualTime);
+  document.getElementById("summary-instructor").textContent = minutesToDuration(totals.instructorTime);
 }
 
 function validateLogbook(entries) {
